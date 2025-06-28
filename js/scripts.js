@@ -5,55 +5,67 @@
 */
 window.addEventListener('DOMContentLoaded', event => {
 
-    const sidebarWrapper = document.getElementById('sidebar-wrapper');
-    let scrollToTopVisible = false;
-    // Closes the sidebar menu
-    const menuToggle = document.body.querySelector('.menu-toggle');
-    menuToggle.addEventListener('click', event => {
-        event.preventDefault();
-        sidebarWrapper.classList.toggle('active');
-        _toggleMenuIcon();
-        menuToggle.classList.toggle('active');
-    })
-
-    // Closes responsive menu when a scroll trigger link is clicked
-    var scrollTriggerList = [].slice.call(document.querySelectorAll('#sidebar-wrapper .js-scroll-trigger'));
-    scrollTriggerList.map(scrollTrigger => {
-        scrollTrigger.addEventListener('click', () => {
-            sidebarWrapper.classList.remove('active');
-            menuToggle.classList.remove('active');
-            _toggleMenuIcon();
-        })
-    });
-
-    function _toggleMenuIcon() {
-        const menuToggleBars = document.body.querySelector('.menu-toggle > .fa-bars');
-        const menuToggleTimes = document.body.querySelector('.menu-toggle > .fa-times');
-        if (menuToggleBars) {
-            menuToggleBars.classList.remove('fa-bars');
-            menuToggleBars.classList.add('fa-times');
-        }
-        if (menuToggleTimes) {
-            menuToggleTimes.classList.remove('fa-times');
-            menuToggleTimes.classList.add('fa-bars');
-        }
+    // Smooth scroll for navigation
+    function setupNavScroll() {
+      const navLinks = document.querySelectorAll('.nav-links a');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          const targetId = this.getAttribute('href');
+          if (targetId.startsWith('#')) {
+            e.preventDefault();
+            document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
     }
 
-    // Scroll to top button appear
-    document.addEventListener('scroll', () => {
-        const scrollToTop = document.body.querySelector('.scroll-to-top');
-        if (document.documentElement.scrollTop > 100) {
-            if (!scrollToTopVisible) {
-                fadeIn(scrollToTop);
-                scrollToTopVisible = true;
-            }
-        } else {
-            if (scrollToTopVisible) {
-                fadeOut(scrollToTop);
-                scrollToTopVisible = false;
-            }
+    // Simple contact form handler (demo only)
+    function setupContactForm() {
+      const form = document.querySelector('.contact-form');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          alert('Thank you for reaching out! We will contact you soon.');
+          form.reset();
+        });
+      }
+    }
+
+    // Carousel logic for all carousels
+    function setupCarousels() {
+      document.querySelectorAll('.carousel').forEach(carousel => {
+        const images = carousel.querySelectorAll('.carousel-images img');
+        let current = 0;
+        // 첫 번째 이미지만 active
+        images.forEach((img, i) => {
+          img.classList.toggle('active', i === 0);
+          if (i === 0) {
+            console.log('첫 이미지 active?', img, img.classList.contains('active'));
+          }
+        });
+        function showImage(idx) {
+          images.forEach((img, i) => {
+            img.classList.toggle('active', i === idx);
+          });
         }
-    })
+        const prevBtn = carousel.querySelector('.carousel-btn.prev');
+        const nextBtn = carousel.querySelector('.carousel-btn.next');
+        if (prevBtn && nextBtn) {
+          prevBtn.onclick = () => {
+            current = (current - 1 + images.length) % images.length;
+            showImage(current);
+          };
+          nextBtn.onclick = () => {
+            current = (current + 1) % images.length;
+            showImage(current);
+          };
+        }
+      });
+    }
+
+    setupNavScroll();
+    setupContactForm();
+    setupCarousels();
 })
 
 function fadeOut(el) {
